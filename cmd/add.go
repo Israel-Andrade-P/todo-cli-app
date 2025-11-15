@@ -27,6 +27,7 @@ var addCmd = &cobra.Command{
 		task := strings.Join(args, " ")
 		myTodos.AddTodo(task)
 		fmt.Println("New todo added!")
+		// fmt.Printf("ID: %d\nTask: %s\nStatus: %v\n", myTodos.Todos[0].ID, myTodos.Todos[0].Task, myTodos.Todos[0].Status)
 	},
 }
 
