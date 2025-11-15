@@ -5,7 +5,9 @@ package cmd
 
 import (
 	"fmt"
+	"strings"
 
+	"github.com/Israel-Andrade-P/todo-cli-app.git/todo"
 	"github.com/spf13/cobra"
 )
 
@@ -16,7 +18,15 @@ var addCmd = &cobra.Command{
 	Long: `A new todo is added to your list, example:
 	add <your todo>`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("add called")
+		if len(args) == 0 {
+			fmt.Println("Pass in a todo argument\nExample: add <todo here>")
+			return
+		}
+
+		myTodos := todo.CreateTodoList()
+		task := strings.Join(args, " ")
+		myTodos.AddTodo(task)
+		fmt.Println("New todo added!")
 	},
 }
 
