@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"strings"
 
 	"github.com/Israel-Andrade-P/todo-cli-app.git/todo"
@@ -22,10 +23,11 @@ var addCmd = &cobra.Command{
 			fmt.Println("Pass in a todo argument\nExample: add <todo here>")
 			return
 		}
-
-		myTodos := todo.CreateTodoList()
 		task := strings.Join(args, " ")
-		myTodos.AddTodo(task)
+		err := todo.AddTodo(task)
+		if err != nil {
+			log.Fatalf("error ERR: %v", err)
+		}
 		fmt.Println("New todo added!")
 		// fmt.Printf("ID: %d\nTask: %s\nStatus: %v\n", myTodos.Todos[0].ID, myTodos.Todos[0].Task, myTodos.Todos[0].Status)
 	},
