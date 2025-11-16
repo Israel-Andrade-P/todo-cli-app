@@ -2,7 +2,10 @@ module github.com/Israel-Andrade-P/todo-cli-app.git
 
 go 1.23.2
 
-require github.com/spf13/cobra v1.10.1
+require (
+	github.com/mergestat/timediff v0.0.4
+	github.com/spf13/cobra v1.10.1
+)
 
 require (
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect

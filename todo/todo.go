@@ -6,6 +6,9 @@ import (
 	"os"
 	"strconv"
 	"text/tabwriter"
+	"time"
+
+	"github.com/mergestat/timediff"
 )
 
 type (
@@ -50,7 +53,7 @@ func AddTodo(body string) error {
 		return err
 	}
 
-	writer.Write([]string{strconv.Itoa(id), body, "Not done", "Now"})
+	writer.Write([]string{strconv.Itoa(id), body, "Not done", time.Now().Format("2006-01-02 15:04:05")})
 	writer.Flush()
 	return nil
 }
@@ -77,8 +80,15 @@ func ListAll() error {
 
 	writer := tabwriter.NewWriter(os.Stdout, 0, 2, 4, ' ', 0)
 
-	for _, todo := range todos {
-		writer.Write([]byte(fmt.Sprintf("%s\t%s\t%s\t%s\n", todo.ID, todo.Task, todo.Status, todo.CreatedAt)))
+	layout := "2006-01-02 15:04:05"
+
+	for _, todo := range todos[1:] {
+		loc := time.Now().Location()
+		t, err := time.ParseInLocation(layout, todo.CreatedAt, loc)
+		if err != nil {
+			return err
+		}
+		writer.Write([]byte(fmt.Sprintf("%s\t%s\t%s\t%s\n", todo.ID, todo.Task, todo.Status, timediff.TimeDiff(t))))
 	}
 	defer writer.Flush()
 	return nil
