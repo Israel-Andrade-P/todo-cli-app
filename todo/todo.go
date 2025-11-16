@@ -2,9 +2,10 @@ package todo
 
 import (
 	"encoding/csv"
+	"fmt"
 	"os"
 	"strconv"
-	"time"
+	"text/tabwriter"
 )
 
 type (
@@ -13,10 +14,10 @@ type (
 		Todos       []Todo
 	}
 	Todo struct {
-		ID        int
+		ID        string
 		Task      string
-		Status    bool
-		CreatedAt time.Time
+		Status    string
+		CreatedAt string
 	}
 )
 
@@ -51,6 +52,35 @@ func AddTodo(body string) error {
 
 	writer.Write([]string{strconv.Itoa(id), body, "Not done", "Now"})
 	writer.Flush()
+	return nil
+}
+
+func ListAll() error {
+	path := "/home/zel/Go/todo-cli-app/todos.csv"
+	f, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+
+	defer f.Close()
+
+	reader := csv.NewReader(f)
+
+	rows, err := reader.ReadAll()
+	if err != nil {
+		return err
+	}
+	var todos []Todo
+	for _, row := range rows {
+		todos = append(todos, Todo{ID: row[0], Task: row[1], Status: row[2], CreatedAt: row[3]})
+	}
+
+	writer := tabwriter.NewWriter(os.Stdout, 0, 2, 4, ' ', 0)
+
+	for _, todo := range todos {
+		writer.Write([]byte(fmt.Sprintf("%s\t%s\t%s\t%s\n", todo.ID, todo.Task, todo.Status, todo.CreatedAt)))
+	}
+	defer writer.Flush()
 	return nil
 }
 
