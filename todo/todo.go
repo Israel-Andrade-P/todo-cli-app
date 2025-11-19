@@ -8,14 +8,11 @@ import (
 	"text/tabwriter"
 	"time"
 
+	"github.com/Israel-Andrade-P/todo-cli-app.git/utils"
 	"github.com/mergestat/timediff"
 )
 
 type (
-	TodoList struct {
-		IdGenerator int
-		Todos       []Todo
-	}
 	Todo struct {
 		ID        string
 		Task      string
@@ -24,12 +21,11 @@ type (
 	}
 )
 
-func CreateTodoList() TodoList {
-	return TodoList{Todos: make([]Todo, 0)}
-}
-
 func AddTodo(body string) error {
-	path := "/home/zel/Go/todo-cli-app/todos.csv"
+	path, err := utils.GetFilePath()
+	if err != nil {
+		return err
+	}
 	f, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
 	if err != nil {
 		return err
@@ -59,7 +55,11 @@ func AddTodo(body string) error {
 }
 
 func ListAll() error {
-	path := "/home/zel/Go/todo-cli-app/todos.csv"
+	path, err := utils.GetFilePath()
+	if err != nil {
+		return err
+	}
+
 	writer := tabwriter.NewWriter(os.Stdout, 0, 2, 4, ' ', 0)
 
 	todos, err := getTodos(path)
@@ -67,7 +67,9 @@ func ListAll() error {
 		return err
 	}
 	layout := "2006-01-02 15:04:05"
-	for _, todo := range todos {
+
+	writer.Write([]byte(fmt.Sprintf("%s\t%s\t%s\t%s\n", todos[0].ID, todos[0].Task, todos[0].Status, todos[0].CreatedAt)))
+	for _, todo := range todos[1:] {
 		loc := time.Now().Location()
 		t, err := time.ParseInLocation(layout, todo.CreatedAt, loc)
 		if err != nil {
@@ -80,7 +82,11 @@ func ListAll() error {
 }
 
 func Delete(id string) (string, error) {
-	path := "/home/zel/Go/todo-cli-app/todos.csv"
+	path, err := utils.GetFilePath()
+	if err != nil {
+		return "", err
+	}
+
 	message := ""
 	todos, err := getTodos(path)
 	if err != nil {
@@ -104,7 +110,7 @@ func Delete(id string) (string, error) {
 	defer writer.Flush()
 
 	writer.Write([]string{"ID", "Task", "Status", "Created"})
-	for _, todo := range todos {
+	for _, todo := range todos[1:] {
 		writer.Write([]string{todo.ID, todo.Task, todo.Status, todo.CreatedAt})
 	}
 	if !deleted {
@@ -147,7 +153,7 @@ func getTodos(path string) ([]Todo, error) {
 		return nil, err
 	}
 	var todos []Todo
-	for _, row := range rows[1:] {
+	for _, row := range rows {
 		todos = append(todos, Todo{ID: row[0], Task: row[1], Status: row[2], CreatedAt: row[3]})
 	}
 	return todos, nil
