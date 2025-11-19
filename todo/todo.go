@@ -122,6 +122,47 @@ func Delete(id string) (string, error) {
 	return message, nil
 }
 
+func Complete(id string) (string, error) {
+	path, err := utils.GetFilePath()
+	if err != nil {
+		return "", err
+	}
+
+	message := ""
+	todos, err := getTodos(path)
+	if err != nil {
+		return message, err
+	}
+	completed := false
+	for i := 0; i < len(todos); i++ {
+		if todos[i].ID == id {
+			completed = true
+			todos[i].Status = "Done"
+		}
+	}
+
+	f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+	if err != nil {
+		return message, err
+	}
+
+	writer := csv.NewWriter(f)
+
+	defer writer.Flush()
+
+	writer.Write([]string{"ID", "Task", "Status", "Created"})
+	for _, todo := range todos[1:] {
+		writer.Write([]string{todo.ID, todo.Task, todo.Status, todo.CreatedAt})
+	}
+	if !completed {
+		message = fmt.Sprintf("Task with ID %s doesn't exist.", id)
+		return message, nil
+	}
+	message = "Task completed!"
+
+	return message, nil
+}
+
 func getId(path string) (int, error) {
 	f, err := os.Open(path)
 	if err != nil {
