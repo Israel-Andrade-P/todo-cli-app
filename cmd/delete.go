@@ -4,7 +4,9 @@ Copyright © 2025 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"errors"
 	"fmt"
+	"io/fs"
 	"log"
 
 	"github.com/Israel-Andrade-P/todo-cli-app.git/todo"
@@ -23,6 +25,10 @@ var deleteCmd = &cobra.Command{
 		}
 		message, err := todo.Delete(args[0])
 		if err != nil {
+			if errors.Is(err, fs.ErrNotExist) {
+				fmt.Println("Please add some todos before doing this command.")
+				return
+			}
 			log.Fatalf("error ERR: %v", err)
 		}
 		fmt.Println(message)

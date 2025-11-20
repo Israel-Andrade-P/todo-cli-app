@@ -21,8 +21,10 @@ type (
 	}
 )
 
+var getFilePath = utils.GetFilePath
+
 func AddTodo(body string) error {
-	path, err := utils.GetFilePath()
+	path, err := getFilePath()
 	if err != nil {
 		return err
 	}
@@ -49,9 +51,9 @@ func AddTodo(body string) error {
 		return err
 	}
 
-	writer.Write([]string{strconv.Itoa(id), body, "Not done", time.Now().Format("2006-01-02 15:04:05")})
+	writer.Write([]string{strconv.Itoa(id), body, "pending", time.Now().Format("2006-01-02 15:04:05")})
 	writer.Flush()
-	return nil
+	return writer.Error()
 }
 
 func ListAll() error {
@@ -93,7 +95,7 @@ func Delete(id string) (string, error) {
 		return message, err
 	}
 	deleted := false
-	for i := 0; i < len(todos); i++ {
+	for i := 1; i < len(todos); i++ {
 		if todos[i].ID == id {
 			deleted = true
 			todos = append(todos[:i], todos[i+1:]...)

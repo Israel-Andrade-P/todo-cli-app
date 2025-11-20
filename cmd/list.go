@@ -4,6 +4,9 @@ Copyright © 2025 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"errors"
+	"fmt"
+	"io/fs"
 	"log"
 
 	"github.com/Israel-Andrade-P/todo-cli-app.git/todo"
@@ -18,6 +21,10 @@ var listCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		err := todo.ListAll()
 		if err != nil {
+			if errors.Is(err, fs.ErrNotExist) {
+				fmt.Println("Please add some todos before doing this command.")
+				return
+			}
 			log.Fatalf("error ERR: %v", err)
 		}
 	},
