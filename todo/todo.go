@@ -84,7 +84,7 @@ func ListAll() error {
 }
 
 func Delete(id string) (string, error) {
-	path, err := utils.GetFilePath()
+	path, err := getFilePath()
 	if err != nil {
 		return "", err
 	}
@@ -125,7 +125,7 @@ func Delete(id string) (string, error) {
 }
 
 func Complete(id string) (string, error) {
-	path, err := utils.GetFilePath()
+	path, err := getFilePath()
 	if err != nil {
 		return "", err
 	}
